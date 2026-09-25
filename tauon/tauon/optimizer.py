@@ -2,17 +2,13 @@ import math
 import torch
 import torch.nn as nn
 
-class tauon:
-    """
-    2-Stage Chebyshev-Gauss Subspace Projection Core for fast matrix orthogonalization.
-    Reduces compute overhead compared to full Newton-Schulz iterations.
-    """
+class tauon_step:
     def __init__(self, M: int, N: int, device="cpu", dtype=torch.float32):
         self.M = M
         self.N = N
         self.transpose = M > N
         self.S = min(M, N)
-        self.K1 = max(4, int(0.25 * self.S))  # 25% DCT subspace compression
+        self.K1 = max(4, int(0.25 * self.S))  
         self.device = device
         self.Q_K1 = self._build_dct_basis(self.K1, self.S, device, dtype)
 
@@ -27,7 +23,6 @@ class tauon:
         G_work = G.T if self.transpose else G
         X = G_work[:self.S, :self.S]
 
-        # Stage 1: Coarse projection in 25% DCT Subspace
         norm_X = torch.linalg.norm(X, ord="fro") + eps
         Z0 = X / norm_X
 
@@ -44,7 +39,6 @@ class tauon:
         norm_coarse = torch.linalg.norm(X_coarse, ord="fro") + eps
         X_full_norm = X_coarse / norm_coarse
 
-        # Stage 2: Full-space refinement using Chebyshev nodes
         a2, b2, c2 = 1.7611, -2.5125, 1.1000
         A2 = torch.matmul(X_full_norm, X_full_norm.T)
         A2_2 = torch.matmul(A2, A2)
@@ -61,11 +55,8 @@ class tauon:
         return G_new_raw * rms_scale
 
 
-class ChebSCGF(torch.optim.Optimizer):
-    """
-    ChebSCGF Optimizer for 2D+ matrix parameters combined with Momentum.
-    """
-    def __init__(self, params, lr=0.035, momentum=0.95, nesterov=True, weight_decay=0.01):
+class tauon(torch.optim.Optimizer):
+    def __init__(self, params, lr=0.02, momentum=0.95, nesterov=True, weight_decay=0.01):
         defaults = dict(lr=lr, momentum=momentum, nesterov=nesterov, weight_decay=weight_decay)
         super().__init__(params, defaults)
         self.scgf_modules = {}
@@ -99,7 +90,7 @@ class ChebSCGF(torch.optim.Optimizer):
 
                     param_id = id(p)
                     if param_id not in self.scgf_modules:
-                        self.scgf_modules[param_id] = ChebSCGFCore(
+                        self.scgf_modules[param_id] = tauon_step(
                             g_2d.shape[0], g_2d.shape[1], device=g_2d.device, dtype=g_2d.dtype
                         )
                     
