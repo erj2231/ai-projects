@@ -8,11 +8,8 @@ jobs:
   pypi-publish:
     name: Build and upload to PyPI
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/tauon-optimizer
     permissions:
-      id-token: write
+      id-token: write  # Обязательно для OIDC / Trusted Publishing
 
     steps:
     - name: Checkout code
@@ -29,10 +26,7 @@ jobs:
         python -m pip install build
 
     - name: Build package
-      working-directory: ./tauon   
       run: python -m build
 
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        packages-dir: ./tauon/dist/ 
