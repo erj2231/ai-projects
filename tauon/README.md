@@ -16,7 +16,7 @@ We evaluated **Tauon** against **Muon** and **AdamW** by training a custom Trans
 
 ### Performance & Convergence Results
 
-![Logo](https://raw.githubusercontent.com/erj2231/ai-projects/tauon/benchmarks/paper_quality_benchmark.png)
+![Logo](https://raw.githubusercontent.com/erj2231/ai-projects/main/tauon/benchmarks/paper_quality_benchmark.png)
 
 ### Key Takeaways
 1. **Convergence (Loss vs Steps):** Tauon achieves lower final validation loss compared to AdamW and converges faster than Muon within the same step count.
