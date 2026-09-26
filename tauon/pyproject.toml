@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tauon" 
+name = "tauon-optimizer" 
 version = "0.1.0"
 description = "Fast Muon-like optimizer with AdamW speed"
 readme = "README.md"
