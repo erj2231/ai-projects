@@ -6,18 +6,6 @@ By unifying **Spectral Domain Analysis via Quasi-QR Control (QRC)**, **Type-II D
 
 ---
 
-## Executive Summary: Performance Profile
-
-| Metric / Feature | AdamW | Muon | **Tauon (Ours)** |
-| :--- | :--- | :--- | :--- |
-| **Accuracy / Convergence** | Baseline | State-of-the-Art | **On par with Muon** |
-| **Per-Step Overhead / Speed** | Fast ($O(MN)$) | Slow ($5\text{--}6 \times O(S^3)$ steps) | **On par with AdamW** |
-| **Newton-Schulz Iterations** | N/A | 5–6 Stationary Steps | **2 Non-Stationary Steps** |
-| **Spectral Optimization Engine** | None | Standard Polynomial | **QRC Spectral Coefficients** |
-| **Subspace Compression** | None | Full Rank ($S \times S$) | **DCT-II Subspace ($K_1 \times K_1$)** |
-
----
-
 ## Theoretical Architecture & Mechanics
 
 Newton-Schulz (NS) iterations approximate matrix polar decomposition ($G \to U V^T$) to equalize singular values across layer weights. Standard implementations (e.g., Muon) rely on repeated applications of a single static polynomial over full-rank matrices:
