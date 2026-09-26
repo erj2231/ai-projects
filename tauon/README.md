@@ -1,5 +1,8 @@
 # Tauon Optimizer
 
+[![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.34002942-blue)](https://doi.org/10.6084/m9.figshare.34002942)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Tauon** is a high-performance, low-latency spectral gradient optimizer designed to deliver the **convergence accuracy of Muon at the operational speed and throughput of AdamW**. 
 
 By unifying **Spectral Domain Analysis via Quasi-QR Control (QRC)**, **Type-II Discrete Cosine Transform (DCT-II) subspace projections**, and a **non-stationary (step-dependent) polynomial schedule**, Tauon compresses standard matrix polar decomposition (Newton-Schulz iterations) into **strictly two matrix-multiplication steps** without degradation in singular-value equalization or downstream task accuracy.
@@ -248,4 +251,16 @@ pip install tauon-optimizer
 import tauon
 
 print(tauon.__version__)
-# opt = tauon.tauon(...)
+opt = tauon.tauon(...)
+
+
+## Citation
+
+```bibtex
+@software{tauon2026,
+  title        = {Tauon: PyTorch Matrix Optimizer},
+  year         = {2026},
+  publisher    = {Figshare},
+  doi          = {10.6084/m9.figshare.34002942},
+  url          = {[https://doi.org/10.6084/m9.figshare.34002942](https://doi.org/10.6084/m9.figshare.34002942)}
+}
