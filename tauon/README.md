@@ -232,3 +232,20 @@ class tauon(torch.optim.Optimizer):
                     g_update = g_proj
 
                 p.data.add_(g_update, alpha=-lr)
+
+---
+
+# tauon-optimizer
+
+Custom Python optimizer library.
+
+## Installation
+```bash
+pip install tauon-optimizer
+
+# QUICKSTART
+
+import tauon
+
+print(tauon.__version__)
+# opt = tauon.tauon(...)
