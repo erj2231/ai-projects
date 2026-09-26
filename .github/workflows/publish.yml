@@ -12,7 +12,7 @@ jobs:
       name: pypi
       url: https://pypi.org/p/tauon-optimizer
     permissions:
-      id-token: write  # Обязательно для PyPI Trusted Publishing
+      id-token: write
 
     steps:
     - name: Checkout code

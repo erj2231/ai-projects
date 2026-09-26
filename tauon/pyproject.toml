@@ -1,10 +1,17 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tauon-optimizer" 
+name = "tauon-optimizer"
 version = "0.1.3"
 description = "Fast Muon-like optimizer with AdamW speed"
 readme = "README.md"
-dependencies = ["torch>=2.0.0"]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tauon*"]
