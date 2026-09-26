@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tauon" 
+version = "0.1.0"
+description = "Fast Muon-like optimizer with AdamW speed"
+readme = "README.md"
+dependencies = ["torch>=2.0.0"]
