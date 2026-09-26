@@ -4,6 +4,25 @@
 
 By unifying **Spectral Domain Analysis via Quasi-QR Control (QRC)**, **Type-II Discrete Cosine Transform (DCT-II) subspace projections**, and a **non-stationary (step-dependent) polynomial schedule**, Tauon compresses standard matrix polar decomposition (Newton-Schulz iterations) into **strictly two matrix-multiplication steps** without degradation in singular-value equalization or downstream task accuracy.
 
+## 📊 Benchmarks
+
+We evaluated **Tauon** against **Muon** and **AdamW** by training a custom Transformer model (**GPT-Mini**: $d_{model}=512$, 6 layers, 8 heads) on the `TinyShakespeare` dataset for 3,000 steps.
+
+### Benchmark Setup
+* **Dataset:** TinyShakespeare (Sequence length = 128, Batch size = 64)
+* **Model:** GPT-Mini (~12M parameters)
+* **Hardware:** NVIDIA GPU with PyTorch Matmul Precision set to `high`
+* **Learning Rate Schedule:** Cosine decay with 100 warmup steps
+
+### Performance & Convergence Results
+
+![tauon vs muon vs adamw](benchmarks/paper_quality_benchmark.png)
+
+### Key Takeaways
+1. **Convergence (Loss vs Steps):** Tauon achieves lower final validation loss compared to AdamW and converges faster than Muon within the same step count.
+2. **Wall-Clock Efficiency:** Despite matrix orthogonalization/projection overhead, Tauon maintains an efficient per-step runtime, leading to faster overall training time to reach target validation loss.
+3. **Compute Cost:** The computational overhead per step is competitive with standard momentum-based orthogonal optimizers like Muon.
+
 ---
 
 ## Theoretical Architecture & Mechanics

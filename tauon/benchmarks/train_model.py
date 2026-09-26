@@ -274,52 +274,69 @@ for opt_name, lr in experiments:
     results[opt_name] = res
     print(f"  ✓ Завершено за {res['total_time']:.2f} сек. | Final Val Loss: {res['final_val_loss']:.4f}")
 
+# --- ПОСТРОЕНИЕ ГРАФИКОВ НА ОСНОВЕ РЕАЛЬНЫХ ДАННЫХ ---
 plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
 fig = plt.figure(figsize=(18, 5), dpi=300)
 
-steps = np.linspace(0, 3000, 100)
-loss_fastscgf = 1.5637 + 1.8 * np.exp(-steps / 600) + 0.02 * np.random.normal(0, 0.1, size=100)
-loss_muon     = 1.6874 + 1.7 * np.exp(-steps / 700) + 0.02 * np.random.normal(0, 0.1, size=100)
-loss_adamw    = 1.8677 + 1.5 * np.exp(-steps / 500) + 0.02 * np.random.normal(0, 0.1, size=100)
+colors = {'tauon': '#1f77b4', 'Muon': '#ff7f0e', 'AdamW': '#2ca02c'}
 
-time_fastscgf = np.linspace(0, 1020.44, 100)
-time_muon     = np.linspace(0, 1125.62, 100)
-time_adamw    = np.linspace(0, 997.04, 100)
+# 1. Извлекаем реальные данные из словаря results
+steps_tauon = results['tauon']['steps']
+loss_tauon  = results['tauon']['val_loss']
+time_tauon  = results['tauon']['times']
 
-colors = {'FastSCGF': '#1f77b4', 'Muon': '#ff7f0e', 'AdamW': '#2ca02c'}
+steps_muon  = results['Muon']['steps']
+loss_muon   = results['Muon']['val_loss']
+time_muon   = results['Muon']['times']
 
+steps_adamw = results['AdamW']['steps']
+loss_adamw  = results['AdamW']['val_loss']
+time_adamw  = results['AdamW']['times']
+
+# Вычисляем миллисекунды на шаг
+ms_tauon = (results['tauon']['total_time'] / MAX_STEPS) * 1000
+ms_muon  = (results['Muon']['total_time'] / MAX_STEPS) * 1000
+ms_adamw = (results['AdamW']['total_time'] / MAX_STEPS) * 1000
+
+# --- График 1: Loss vs Steps ---
 ax1 = plt.subplot(1, 3, 1)
-ax1.plot(steps, loss_fastscgf, label='FastSCGF (LR=0.035)', color=colors['FastSCGF'], linewidth=2)
-ax1.plot(steps, loss_muon, label='Muon (LR=0.02)', color=colors['Muon'], linewidth=2, linestyle='--')
-ax1.plot(steps, loss_adamw, label='AdamW (LR=0.001)', color=colors['AdamW'], linewidth=1.5, alpha=0.7)
+ax1.plot(steps_tauon, loss_tauon, label=f"Tauon (LR={dict(experiments)['tauon']})", color=colors['tauon'], linewidth=2)
+ax1.plot(steps_muon, loss_muon, label=f"Muon (LR={dict(experiments)['Muon']})", color=colors['Muon'], linewidth=2, linestyle='--')
+ax1.plot(steps_adamw, loss_adamw, label=f"AdamW (LR={dict(experiments)['AdamW']})", color=colors['AdamW'], linewidth=1.5, alpha=0.7)
 ax1.set_title("Validation Loss vs Steps", fontsize=12, fontweight='bold')
 ax1.set_xlabel("Steps")
 ax1.set_ylabel("Validation Loss")
 ax1.legend(frameon=True)
 ax1.grid(True, linestyle='--', alpha=0.5)
 
+# --- График 2: Loss vs Time ---
 ax2 = plt.subplot(1, 3, 2)
-ax2.plot(time_fastscgf, loss_fastscgf, label='FastSCGF (1020s)', color=colors['FastSCGF'], linewidth=2)
-ax2.plot(time_muon, loss_muon, label='Muon (1125s)', color=colors['Muon'], linewidth=2, linestyle='--')
-ax2.plot(time_adamw, loss_adamw, label='AdamW (997s)', color=colors['AdamW'], linewidth=1.5, alpha=0.7)
+ax2.plot(time_tauon, loss_tauon, label=f"Tauon ({results['tauon']['total_time']:.0f}s)", color=colors['tauon'], linewidth=2)
+ax2.plot(time_muon, loss_muon, label=f"Muon ({results['Muon']['total_time']:.0f}s)", color=colors['Muon'], linewidth=2, linestyle='--')
+ax2.plot(time_adamw, loss_adamw, label=f"AdamW ({results['AdamW']['total_time']:.0f}s)", color=colors['AdamW'], linewidth=1.5, alpha=0.7)
 ax2.set_title("Validation Loss vs Wall-Clock Time", fontsize=12, fontweight='bold')
 ax2.set_xlabel("Time (seconds)")
 ax2.set_ylabel("Validation Loss")
 ax2.legend(frameon=True)
 ax2.grid(True, linestyle='--', alpha=0.5)
 
+# --- График 3: Compute Cost (ms / step) ---
 ax3 = plt.subplot(1, 3, 3)
-names = ['FastSCGF', 'Muon', 'AdamW']
-ms_per_step = [340.15, 375.21, 332.35]
+names = ['tauon', 'Muon', 'AdamW']
+ms_per_step = [ms_tauon, ms_muon, ms_adamw]
 bars = ax3.bar(names, ms_per_step, color=[colors[n] for n in names], width=0.45, edgecolor='black', alpha=0.85)
 ax3.set_title("Compute Cost (ms / step)", fontsize=12, fontweight='bold')
 ax3.set_ylabel("Milliseconds per Step")
-ax3.set_ylim(280, 400)
+
+# Динамическая настройка предела Y-оси на основе реальных значений
+y_min = min(ms_per_step) * 0.8
+y_max = max(ms_per_step) * 1.15
+ax3.set_ylim(y_min, y_max)
 ax3.grid(axis='y', linestyle='--', alpha=0.5)
 
 for bar in bars:
     yval = bar.get_height()
-    ax3.text(bar.get_x() + bar.get_width()/2, yval + 2, f"{yval:.1f} ms", ha='center', va='bottom', fontweight='bold')
+    ax3.text(bar.get_x() + bar.get_width()/2, yval + (y_max - y_min) * 0.02, f"{yval:.1f} ms", ha='center', va='bottom', fontweight='bold')
 
 plt.suptitle("GPT-Mini (d_model=512, 6 Layers) Benchmark on TinyShakespeare", fontsize=14, fontweight='bold', y=1.03)
 plt.tight_layout()
