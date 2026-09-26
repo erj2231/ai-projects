@@ -29,7 +29,10 @@ jobs:
         python -m pip install build
 
     - name: Build package
+      working-directory: ./tauon   
       run: python -m build
 
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: ./tauon/dist/ 
